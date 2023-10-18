@@ -1,0 +1,6 @@
+remote_theme: pages-themes/minimal@v0.2.0
+title: Matt  @ dit
+logo: /images/cimg.png
+description: 
+plugins:
+  - jekyll-remote-theme
