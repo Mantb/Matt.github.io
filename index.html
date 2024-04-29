@@ -9,8 +9,8 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="styles.css">
     <!-- Font imports -->
-    <link rel="stylesheet" href="path/to/fonts/SFUIDisplay-Thin.woff">
-    <link rel="stylesheet" href="path/to/fonts/SFUIText-Medium.woff">
+    <link rel="stylesheet" href="assets/fonts/SFUIDisplay-Thin.woff">
+    <link rel="stylesheet" href="assets/fonts/SFUIText-Medium.woff">
 </head>
 <body data-spy="scroll" data-target="#navbar" data-offset="50">
 
@@ -36,12 +36,20 @@
                         <a class="nav-link" href="#contact">Contact</a>
                     </li>
                 </ul>
+                <!-- Dark Mode Switch -->
+                <div class="custom-control custom-switch ml-3">
+                    <input type="checkbox" class="custom-control-input" id="themeSwitch">
+                    <label class="custom-control-label" for="themeSwitch">Toggle Dark Mode</label>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section id="hero" class="d-flex align-items-center">
+      <!-- Inside the Hero Section -->
+      <h1 id="myName" style="font-family: 'SFUIText-Medium', Arial, sans-serif;">Your Name</h1>
+
         <div class="container text-center text-md-left">
             <h1 style="font-family: 'SFUIText-Medium', Arial, sans-serif;">Your Name</h1>
             <p class="lead">Frontend Developer | UX/UI Designer | Open Source Enthusiast</p>
