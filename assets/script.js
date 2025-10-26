@@ -1,4 +1,4 @@
-// JavaScript file (e.g., scripts.js)
+// JavaScript file (assets/scripts.js)
 document.addEventListener('DOMContentLoaded', function() {
     const themeSwitch = document.getElementById('themeSwitch');
     const myName = document.getElementById('myName');
