@@ -1,6 +1,6 @@
 #ifndef HP_FILE_STRUCTS_H
 #define HP_FILE_STRUCTS_H
-#include <stdint.h>
+#include <stdint.h> //added for uint32_t
 #include <record.h>
 
 /**

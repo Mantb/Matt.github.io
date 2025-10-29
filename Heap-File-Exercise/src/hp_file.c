@@ -73,7 +73,7 @@ int HeapFile_Close(int file_handle, HeapFileHeader *hp_info)
     if (hp_info == NULL) {
         return 0; // Invalid argument
     }
-    BF_Block* block;
+    BF_Block *block;
     BF_Block_Init(&block);
     CALL_BF(BF_GetBlock(file_handle, 0, block)); // pinned
     void* data = BF_Block_GetData(block);
@@ -88,31 +88,125 @@ int HeapFile_Close(int file_handle, HeapFileHeader *hp_info)
 
 int HeapFile_InsertRecord(int file_handle, HeapFileHeader *hp_info, const Record record)
 {
-  int rec_size= sizeof(Record);
-  BF_Block* block;
+  int rec_size= sizeof(Record);//the first step of the insertion is to calculate the size of the record
+  BF_Block* block;// And then calculating the offset where the new record will be inserted
   BF_Block_Init(&block);
-  CALL_BF(BF_GetBlock(file_handle, 0, block)); // pinned
+  //but first for the first page we have to do it differently
+  if (hp_info->pageCount==0){
+    //we have to allocate the first block
+    CALL_BF(BF_AllocateBlock(file_handle, block));
+    hp_info->pageCount=1;
+    hp_info->firstFreePage=1;
+    //initialize record count to 0
+    char* data = BF_Block_GetData(block);
+    uint16_t* recCountPtr = (uint16_t*)data;
+    *recCountPtr = 0;
+    BF_Block_SetDirty(block);
+    CALL_BF(BF_UnpinBlock(block));
+    BF_Block_Destroy(&block);
+    //now we can proceed to insert the record in the newly allocated block
+  }
+  int target_space;
+  if (hp_info->firstFreePage==UINT32_MAX){
+    target_space=hp_info->firstFreePage;
+  } else {
+    target_space=hp_info->pageCount;
+  }
+  BF_Block_Init(&block);
+  CALL_BF(BF_GetBlock(file_handle, target_space, block));
   char* data = BF_Block_GetData(block);
-  BF_Block* block;
-  /* page-local record count stored at first 2 bytes */
   uint16_t* recCountPtr = (uint16_t*)data;
   uint16_t recCount = *recCountPtr;
-  /* offset inside THIS page */
+  uint16_t maxRecs = (hp_info->pageSize - sizeof(uint16_t)) / rec_size;
+  if (recCount== maxRecs) {
+    // current block full — allocate a new page
+        BF_Block_SetDirty(block);
+        CALL_BF(BF_UnpinBlock(block));
+        BF_Block_Destroy(&block);
+        //now creating a new block
+        BF_Block_Init(&block);
+        CALL_BF(BF_AllocateBlock(file_handle, block));
+        char *new_data = BF_Block_GetData(block);
+        uint16_t *newCount = (uint16_t *)new_data;
+        *newCount = 0;
+
+        hp_info->pageCount += 1;
+        hp_info->firstFreePage = hp_info->pageCount;
+
+        data = new_data;
+        recCountPtr = newCount;
+        recCount = 0;
+  }
+  // Lastly insert the record
   int offset = sizeof(uint16_t) + recCount * rec_size;
-  return 1;
+  memcpy(data + offset, &record, rec_size);
+  (*recCountPtr)++;
+
+  BF_UnpinBlock(block);
+  BF_Block_SetDirty(block);
+  BF_Block_Destroy(&block);
+  //update header info 
+    BF_Block *hdr_block;
+    BF_Block_Init(&hdr_block);
+    CALL_BF(BF_GetBlock(file_handle, 0, hdr_block));
+    char *hdr_data = BF_Block_GetData(hdr_block);
+    memcpy(hdr_data, hp_info, sizeof(HeapFileHeader));
+    BF_Block_SetDirty(hdr_block);
+    CALL_BF(BF_UnpinBlock(hdr_block));
+    BF_Block_Destroy(&hdr_block);
+
+  return 0;
 }
 
 
 HeapFileIterator HeapFile_CreateIterator(    int file_handle, HeapFileHeader* header_info, int id)
 {
   HeapFileIterator out;
+  out.file_handle=file_handle;
+  out.currentPage=1;//block 0 has the metadata
+  out.currentSlot=0;
+  out.totalPages=header_info->pageCount;
   return out;
 }
 
 
 int HeapFile_GetNextRecord(    HeapFileIterator* heap_iterator, Record** record)
-{
-    * record=NULL;
-    return 1;
+{   if (heap_iterator==NULL || record==NULL){
+      return 0;
+    }
+    *record=NULL;
+    if (heap_iterator->totalPages==0){
+      return 0;//nothing to read
+    }
+    while(heap_iterator->currentPage<=heap_iterator->totalPages){
+      BF_Block* block;
+      BF_Block_Init(&block);
+      CALL_BF(BF_GetBlock(heap_iterator->file_handle, (int)heap_iterator->currentPage, block));
+      
+      char* data = BF_Block_GetData(block);
+      uint16_t recCount = *((uint16_t*)data);
+      int rec_size= sizeof(Record);
+      if (heap_iterator->currentSlot<recCount){
+        //record found
+        int offset = sizeof(uint16_t) + heap_iterator->currentSlot * rec_size;
+        *record=(Record*)(data + offset);
+        heap_iterator->currentSlot++;
+        if (heap_iterator->currentSlot>=recCount){
+          heap_iterator->currentPage++;
+          heap_iterator->currentSlot=0;
+        }
+        memcpy(*record, data + offset, sizeof(Record));
+        CALL_BF(BF_UnpinBlock(block));
+        BF_Block_Destroy(&block);
+        return 1;
+      } else {
+        //move to next page
+        CALL_BF(BF_UnpinBlock(block));
+        BF_Block_Destroy(&block);
+        heap_iterator->currentPage++;
+        heap_iterator->currentSlot=0;
+      }
+    }
+    return 0;
 }
 
