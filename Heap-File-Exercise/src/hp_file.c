@@ -88,6 +88,17 @@ int HeapFile_Close(int file_handle, HeapFileHeader *hp_info)
 
 int HeapFile_InsertRecord(int file_handle, HeapFileHeader *hp_info, const Record record)
 {
+  int rec_size= sizeof(Record);
+  BF_Block* block;
+  BF_Block_Init(&block);
+  CALL_BF(BF_GetBlock(file_handle, 0, block)); // pinned
+  char* data = BF_Block_GetData(block);
+  BF_Block* block;
+  /* page-local record count stored at first 2 bytes */
+  uint16_t* recCountPtr = (uint16_t*)data;
+  uint16_t recCount = *recCountPtr;
+  /* offset inside THIS page */
+  int offset = sizeof(uint16_t) + recCount * rec_size;
   return 1;
 }
 
