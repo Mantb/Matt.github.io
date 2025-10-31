@@ -15,9 +15,9 @@
  * @brief Heap file header containing metadata about the file organization
  */
 typedef struct HeapFileHeader {
-    int pageCount;     // Number of pages in the heap file
-    int pageSize;      // Size of each page in bytes
-    int firstFreePage; // Index of the first page with free space
+    int blockCount;     // Number of blocks in the heap file
+    int blockSize;      // Size of each block in bytes
+    int firstFreeBlock; // Index of the first block with free space
 } HeapFileHeader;
 
 /**
@@ -25,10 +25,10 @@ typedef struct HeapFileHeader {
  */
 typedef struct HeapFileIterator{
     int file_handle;    //file descriptor for the heap file
-    int currentPage;  //current page index (1..pageCount) */
-    int currentSlot;  //current slot index within current page (0..slotCount-1) */
-    int totalPages;   // Cached total number of pages to know when to stop
-    int record_id; //just for the search implemetation for the hp_main
+    int currentBlock;  //current block index (1..blockCount-1) */
+    int currentRecord;  //current record index within current block (0..recordCount-1) */
+    int totalBlocks;   // Cached total number of blocks to know when to stop
+    int record_id; //just for the search implemetation for search in the hp_main
 } HeapFileIterator;
 
 #endif /* HP_FILE_STRUCTS_H */
