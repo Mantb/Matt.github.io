@@ -1,6 +1,5 @@
 #ifndef HP_FILE_STRUCTS_H
 #define HP_FILE_STRUCTS_H
-#include <stdint.h> //added for uint32_t
 #include <record.h>
 
 /**
@@ -16,19 +15,20 @@
  * @brief Heap file header containing metadata about the file organization
  */
 typedef struct HeapFileHeader {
-    uint32_t pageCount;     // Number of pages in the heap file
-    uint32_t pageSize;      // Size of each page in bytes
-    uint32_t firstFreePage; // Index of the first page with free space
+    int pageCount;     // Number of pages in the heap file
+    int pageSize;      // Size of each page in bytes
+    int firstFreePage; // Index of the first page with free space
 } HeapFileHeader;
 
 /**
  * @brief Iterator for scanning through records in a heap file
  */
 typedef struct HeapFileIterator{
-    int file_handle;       /* BF file handle */
-    uint32_t currentPage;  /* current page index (1..pageCount) */
-    uint32_t currentSlot;  /* current slot index within current page (0..slotCount-1) */
-    uint32_t totalPages;   /* cached total pages for quick EOF detection */ // Current record slot in the page   // Cached total number of pages to know when to stop
+    int file_handle;    //file descriptor for the heap file
+    int currentPage;  //current page index (1..pageCount) */
+    int currentSlot;  //current slot index within current page (0..slotCount-1) */
+    int totalPages;   // Cached total number of pages to know when to stop
+    int record_id; //just for the search implemetation for the hp_main
 } HeapFileIterator;
 
 #endif /* HP_FILE_STRUCTS_H */
