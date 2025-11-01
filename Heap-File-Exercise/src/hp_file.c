@@ -206,7 +206,7 @@ int HeapFile_GetNextRecord(    HeapFileIterator* heap_iterator, Record** record)
     heap_iterator->currentBlock++;
     heap_iterator->currentRecord=0;
   }
-  return 1;
+  return 0; // No more records
 }
  
 
