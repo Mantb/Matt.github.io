@@ -17,7 +17,7 @@
 typedef struct HeapFileHeader {
     int blockCount;     // Number of blocks in the heap file
     int blockSize;      // Size of each block in bytes
-    int firstFreeBlock; // Index of the first block with free space
+    int firstFreeBlock; // Index of the first block with free space (-1 if none)
 } HeapFileHeader;
 
 /**
@@ -28,6 +28,7 @@ typedef struct HeapFileIterator{
     int currentBlock;  //current block index (1..blockCount-1) */
     int currentRecord;  //current record index within current block (0..recordCount-1) */
     int totalBlocks;   // Cached total number of blocks to know when to stop
+    //those three above are to help with the next recort implementation
     int record_id; //just for the search implemetation for search in the hp_main
 } HeapFileIterator;
 
