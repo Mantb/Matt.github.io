@@ -1,141 +1,426 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Portfolio</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/styles.css">
-    <!-- Font imports -->
-    <link rel="stylesheet" href="assets/fonts/SFUIDisplay-Thin.woff">
-    <link rel="stylesheet" href="assets/fonts/SFUIText-Medium.woff">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Matthaios Bonis — Systems Programmer & Compiler Engineer. Portfolio featuring a custom Linux GRR scheduler patch, a MiniJava static checker, a multi-threaded job-coordination server, and a full-stack event platform with from-scratch BMF recommendations." />
+  <meta name="theme-color" content="#0b0f14" />
+  <title>Matthaios Bonis — Systems & Compiler Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b0f14'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' font-family='monospace' font-weight='700' font-size='34' fill='%2300ff9c'%3E%3E_%3C/text%3E%3C/svg%3E" />
 </head>
-<body data-spy="scroll" data-target="#navbar" data-offset="50">
+<body>
+  <div class="grid-bg" aria-hidden="true"></div>
 
-    <!-- Navbar -->
-    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="#"><h1 id="myName" style="font-family: 'SFUIText-Medium', Arial, sans-serif;">Your Name</h1></a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#about">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#projects">Projects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#experience">Experience</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
-                    </li>
-                </ul>
-                <!-- Dark Mode Switch -->
-                <div class="custom-control custom-switch ml-3">
-                    <input type="checkbox" class="custom-control-input" id="themeSwitch">
-                    <label class="custom-control-label" for="themeSwitch">Toggle Dark Mode</label>
-                </div>
-            </div>
+  <!-- ───── Top Nav ───── -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="#hero" class="nav__brand">
+        <span class="prompt">&gt;_</span><span class="brand-text">matt.bonis</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#about">about</a>
+        <a href="#projects">projects</a>
+        <a href="#contact">contact</a>
+      </nav>
+      <button class="nav__toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ───── Hero ───── -->
+  <section id="hero" class="hero">
+    <div class="container hero__inner">
+      <div class="hero__text">
+        <p class="eyebrow">// systems programming · compiler engineering</p>
+        <h1 class="hero__title">
+          <span class="line">Matthaios</span>
+          <span class="line accent">Bonis<span class="cursor">_</span></span>
+        </h1>
+        <p class="hero__lede">
+          I build the invisible foundations. My focus lives at the boundary
+          between hardware and software &mdash; custom Linux schedulers,
+          multi-threaded servers in C, type-checkers that walk ASTs, and
+          full-stack systems where performance is a first-class concern,
+          not an afterthought.
+        </p>
+        <div class="hero__cta">
+          <a href="#projects" class="btn btn--primary">view projects <span class="arr">→</span></a>
+          <a href="#contact" class="btn btn--ghost">get in touch</a>
         </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section id="hero" class="d-flex align-items-center">
-      <!-- Inside the Hero Section -->
-      
-        <div class="container text-center text-md-left">
-            <h1 style="font-family: 'SFUIText-Medium', Arial, sans-serif;">Your Name</h1>
-            <p class="lead">Frontend Developer | UX/UI Designer | Open Source Enthusiast</p>
-            <a href="#about" class="btn btn-primary">Learn More</a>
+        <ul class="hero__meta">
+          <li><span class="dot dot--ok"></span>open to systems &amp; compiler roles</li>
+          <li><span class="dot"></span>based in Greece &middot; CET</li>
+        </ul>
+      </div>
+      <div class="hero__panel" aria-hidden="true">
+        <div class="panel-head">
+          <span class="dot dot--r"></span><span class="dot dot--y"></span><span class="dot dot--g"></span>
+          <span class="panel-title">~/grr-scheduler &mdash; sched_class.c</span>
         </div>
-    </section>
+<pre class="panel-body"><code><span class="c">// guaranteed round-robin scheduling class</span>
+<span class="k">DEFINE_SCHED_CLASS</span>(grr) = {
+    .enqueue_task      = enqueue_task_grr,
+    .dequeue_task      = dequeue_task_grr,
+    .pick_next_task    = pick_next_task_grr,
+    .balance           = balance_grr,  <span class="c">// group-aware, 500ms throttle</span>
+    .task_tick         = task_tick_grr,
+    .switched_to       = switched_to_grr,
+    .select_task_rq    = select_task_rq_grr,
+    <span class="c">// wired into linux 6.14 kernel/sched/grr.c</span>
+};
+</code></pre>
+      </div>
+    </div>
+  </section>
 
-    <!-- About Section -->
-    <section id="about" class="py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h2 style="font-family: 'SFUIDisplay-Thin', Arial, sans-serif;">About Me</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed auctor arcu at mi ullamcorper, vel tempor libero consequat. Nullam ut mi eu mi commodo gravida non vel ex.</p>
-                </div>
-                <div class="col-md-6">
-                    <img src="profile.jpg" alt="Profile Picture" class="img-fluid rounded-circle">
-                </div>
-            </div>
+  <!-- ───── About ───── -->
+  <section id="about" class="about">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">01 // about</span>
+        <h2>Who I am</h2>
+      </div>
+      <div class="about__grid">
+        <div class="about__bio">
+          <p>
+            I&rsquo;m a Computer Science student at the <strong>University of Ioannina</strong>,
+            deeply fascinated by the invisible layers that power modern computing.
+            My focus lies at the intersection of operating systems, compiler
+            construction, and high-performance concurrent systems.
+          </p>
+          <p>
+            Rather than building web interfaces, I prefer working where
+            milliseconds matter &mdash; whether that means implementing a
+            custom Guaranteed Round Robin scheduler in the Linux kernel or
+            building static type checkers for Java, I approach engineering
+            with a rigorous, systems-level mindset. I like projects you can
+            read top-to-bottom in a single sitting.
+          </p>
         </div>
-    </section>
+        <ul class="stats">
+          <li>
+            <span class="stat__num">4</span>
+            <span class="stat__lbl">flagship projects shipped</span>
+          </li>
+          <li>
+            <span class="stat__num">~24k</span>
+            <span class="stat__lbl">lines of code in featured work</span>
+          </li>
+          <li>
+            <span class="stat__num">C &middot; C++ &middot; Java</span>
+            <span class="stat__lbl">primary languages</span>
+          </li>
+          <li>
+            <span class="stat__num">linux 6.14</span>
+            <span class="stat__lbl">kernel tree patched</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
-    <!-- Projects Section -->
-    <section id="projects" class="py-5 bg-light">
-        <div class="container">
-            <h2 style="font-family: 'SFUIText-Medium', Arial, sans-serif;">Projects</h2>
-            <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <div class="card">
-                        <img src="project1.jpg" class="card-img-top" alt="Project 1">
-                        <div class="card-body">
-                            <h5 class="card-title">Project 1</h5>
-                            <p class="card-text">Description of Project 1.</p>
-                            <a href="#" class="btn btn-primary">View Project</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- More projects cards -->
-            </div>
-        </div>
-    </section>
+  <!-- ───── Projects ───── -->
+  <section id="projects" class="projects">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">02 // featured work</span>
+        <h2>Selected projects</h2>
+        <p class="section-sub">
+          A curated set of technical implementations &mdash; each one a real
+          system with a non-trivial piece of engineering under the hood.
+        </p>
+      </div>
 
-    <!-- Experience Section -->
-    <section id="experience" class="py-5">
-        <div class="container">
-            <h2 style="font-family: 'SFUIDisplay-Thin', Arial, sans-serif;">Experience</h2>
-            <div class="row">
-                <div class="col-md-4">
-                    <h4>Company 1</h4>
-                    <p>Position: Web Developer</p>
-                    <p>Duration: January 2020 - Present</p>
-                </div>
-                <!-- More experience details -->
-            </div>
-        </div>
-    </section>
-    <!-- Footer -->
-<footer class="py-4 bg-dark text-white">
-  <div class="container text-center">
-      <p>Available for select freelance opportunities</p>
-      <p>Have an exciting project you need help with? Send me an email or contact me via instant message!</p>
-      <p><a href="mailto:tamal@tamalsen.dev">tamal@tamalsen.dev</a></p>
-      <p>
-          <a href="#">Messenger</a> | 
-          <a href="#">LinkedIn</a> | 
-          <a href="#">Instagram</a> | 
-          <a href="#">Github</a>
-      </p>
-      <hr>
-      <h5>Quotes</h5>
-      <blockquote class="blockquote">
-          <p class="mb-0">"Tamal is a talented developer with a keen eye for detail."</p>
-          <footer class="blockquote-footer">John Doe, CEO at ABC Corp</footer>
-      </blockquote>
-      <blockquote class="blockquote">
-          <p class="mb-0">"Working with Tamal was a pleasure. He delivered high-quality work on time."</p>
-          <footer class="blockquote-footer">Jane Smith, UX Designer</footer>
-      </blockquote>
-      <!-- Add more quotes if needed -->
-  </div>
-</footer>
+      <div class="projects__grid">
 
-    <!-- Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- Custom JS -->
-    <script src="assets/script.js"></script>
+        <!-- ░░ Project 1 · GRR Scheduler ░░ -->
+        <article class="card card--feat">
+          <header class="card__head">
+            <div class="card__tag tag--kern">kernel &middot; c</div>
+            <span class="card__year">2024</span>
+          </header>
+          <h3 class="card__title">Custom Linux GRR Scheduler</h3>
+          <p class="card__sub">
+            A full <code>sched_class</code> implementation wired into
+            <strong>linux 6.14</strong> &mdash; a Guaranteed Round Robin
+            policy built to deliver predictable execution windows for
+            latency-sensitive tasks. I extended the core scheduling
+            structures, owned the per-CPU runqueue, and made every migration
+            decision both group-aware and rate-limited.
+          </p>
+
+          <ul class="card__bullets">
+            <li><span>Full RR pipeline</span><span class="meta">enqueue &middot; pick_next &middot; task_tick</span></li>
+            <li><span>balance_grr</span><span class="meta">push/pull, 500ms throttle</span></li>
+            <li><span>grr_performance_mask</span><span class="meta">DEFAULT vs PERFORMANCE groups</span></li>
+            <li><span>double_lock_balance</span><span class="meta">safe cross-CPU migration</span></li>
+          </ul>
+
+          <div class="card__snippet">
+<pre><code><span class="k">static void</span> enqueue_task_grr(<span class="t">struct rq</span> *rq,
+                            <span class="t">struct task_struct</span> *p,
+                            <span class="t">int</span> flags) {
+    <span class="t">struct grr_rq</span> *grr_rq = &amp;rq-&gt;grr;
+    <span class="k">if</span> (!p-&gt;grr.time_slice)
+        p-&gt;grr.time_slice = GRR_TIMESLICE;
+    list_add_tail(&amp;p-&gt;grr.run_list, &amp;grr_rq-&gt;queue);
+    grr_rq-&gt;nr_running++;
+}</code></pre>
+          </div>
+
+          <footer class="card__foot">
+            <span class="lang">linux/sched/grr.c &middot; ~450 LOC</span>
+            <span class="badge">defensive locking</span>
+            <span class="badge">cpumask</span>
+            <span class="badge">sched_class</span>
+            <a class="card__link" href="https://github.com/Hadjitofis/Os_project1" target="_blank" rel="noopener">view on github <span class="arr">→</span></a>
+          </footer>
+        </article>
+
+        <!-- ░░ Project 2 · MiniJava Static Checker ░░ -->
+        <article class="card card--feat">
+          <header class="card__head">
+            <div class="card__tag tag--comp">compilers &middot; java</div>
+            <span class="card__year">2024</span>
+          </header>
+          <h3 class="card__title">MiniJava Static Checker</h3>
+          <p class="card__sub">
+            The semantic-analysis phase of a complete MiniJava compiler.
+            <strong>JavaCC</strong> produces the parse tree, <strong>JTB</strong>
+            generates the visitor scaffolding, and a hand-written two-pass
+            visitor enforces scoping, type safety and inheritance validity
+            before code generation. It catches the subtle errors &mdash;
+            override signature mismatches, non-assignable arguments, broken
+            vtable layouts &mdash; that a single-pass checker misses.
+          </p>
+
+          <ul class="card__bullets">
+            <li><span>Symboltlb (Pass 1)</span><span class="meta">class table + offsets</span></li>
+            <li><span>TypeCheckVisitor (Pass 2)</span><span class="meta">subtyping &middot; assignability</span></li>
+            <li><span>vtable build</span><span class="meta">override slot reuse</span></li>
+            <li><span>offset layout</span><span class="meta">int=4 &middot; bool=1 &middot; ref=8</span></li>
+          </ul>
+
+          <div class="card__snippet">
+<pre><code><span class="c">// inheritance + method resolution</span>
+<span class="t">Methodinfo</span> resolveMethod(<span class="t">String</span> recv,
+                            <span class="t">String</span> name,
+                            <span class="t">List&lt;Types&gt;</span> args) {
+    <span class="k">for</span> (<span class="t">Classinfo</span> c = classTable.get(recv);
+         c != <span class="k">null</span>; c = classTable.get(c.parent)) {
+        <span class="k">for</span> (<span class="t">Methodinfo</span> m : c.methods)
+            <span class="k">if</span> (m.name.equals(name)
+                &amp;&amp; m.params.equals(args)
+                &amp;&amp; assignableAll(args, m.params))
+                <span class="k">return</span> m;
+    }
+    reportError(<span class="s">"method not found"</span>);
+    <span class="k">return null</span>;
+}</code></pre>
+          </div>
+
+          <footer class="card__foot">
+            <span class="lang">JavaCC &middot; JTB &middot; 2-pass Visitor</span>
+            <span class="badge">AST</span>
+            <span class="badge">subtyping</span>
+            <span class="badge">vtable</span>
+            <a class="card__link" href="https://github.com/Mantb/compilers-hw2" target="_blank" rel="noopener">view on github <span class="arr">→</span></a>
+          </footer>
+        </article>
+
+        <!-- ░░ Project 3 · jms_coord ░░ -->
+        <article class="card card--feat">
+          <header class="card__head">
+            <div class="card__tag tag--sys">systems &middot; c</div>
+            <span class="card__year">2024</span>
+          </header>
+          <h3 class="card__title">jms_coord &mdash; Multi-Threaded Job Server</h3>
+          <p class="card__sub">
+            A high-concurrency Job Management System coordinator written in
+            pure C. A pool of worker threads waits on a condition variable,
+            handlers accept jobs over a text-based protocol, and children
+            are launched with <code>fork</code> + <code>execvp</code> with
+            their output redirected to per-job directories &mdash; the
+            textbook monitor pattern, made deadlock-free.
+          </p>
+
+          <ul class="card__bullets">
+            <li><span>Monitor pattern</span><span class="meta">mutex + cond_non_empty</span></li>
+            <li><span>fork / execvp</span><span class="meta">per-job output dir</span></li>
+            <li><span>read_line / write_all</span><span class="meta">no partial TCP reads</span></li>
+            <li><span>graceful shutdown</span><span class="meta">cond_broadcast + join</span></li>
+          </ul>
+
+          <div class="card__snippet">
+<pre><code><span class="c">// worker: wait on the monitor, then run a job</span>
+pthread_mutex_lock(&amp;queue_lock);
+<span class="k">while</span> (queue_empty &amp;&amp; !shutting_down)
+    pthread_cond_wait(&amp;cond_non_empty, &amp;queue_lock);
+job = dequeue();
+pthread_mutex_unlock(&amp;queue_lock);
+
+<span class="k">if</span> (job) {
+    pid_t pid = fork();
+    <span class="k">if</span> (pid == 0) { dup2(out_fd, 1); dup2(out_fd, 2);
+                    execvp(job-&gt;argv[0], job-&gt;argv); }
+    waitpid(pid, &amp;status, 0);
+}</code></pre>
+          </div>
+
+          <footer class="card__foot">
+            <span class="lang">C &middot; POSIX &middot; pthreads</span>
+            <span class="badge">TCP</span>
+            <span class="badge">thread pool</span>
+            <span class="badge">fork/exec</span>
+            <a class="card__link" href="https://github.com/disyspro/hw2-Mantb" target="_blank" rel="noopener">view on github <span class="arr">→</span></a>
+          </footer>
+        </article>
+
+        <!-- ░░ Project 4 · Tedy (BMF + Booking) ░░ -->
+        <article class="card card--feat">
+          <header class="card__head">
+            <div class="card__tag tag--full">full-stack &middot; ts</div>
+            <span class="card__year">2025</span>
+          </header>
+          <h3 class="card__title">Tedy &mdash; Event Platform w/ BMF Recommendations</h3>
+          <p class="card__sub">
+            A scalable event-discovery platform built to handle thousands of
+            concurrent registrations. <strong>Angular</strong> on the front,
+            <strong>NestJS + Prisma + PostgreSQL</strong> underneath, and a
+            recommendation engine I trained from scratch: a Biased Matrix
+            Factorization model with SGD, blended across bookings, views and
+            negative signals. Booking itself is concurrency-safe via
+            <code>Serializable</code> isolation and a <code>SELECT &hellip;
+            FOR UPDATE</code> row lock &mdash; no oversold tickets.
+          </p>
+
+          <ul class="card__bullets">
+            <li><span>BMF from scratch</span><span class="meta">10 factors &middot; 80 epochs &middot; L2 reg</span></li>
+            <li><span>signal blending</span><span class="meta">bookings 1.0 &middot; views 0.3 (cap 0.8) &middot; neg 0.0</span></li>
+            <li><span>booking safety</span><span class="meta">FOR UPDATE + atomic decrement</span></li>
+            <li><span>fallback</span><span class="meta">popularity for users w/o history</span></li>
+          </ul>
+
+          <div class="card__snippet">
+<pre><code><span class="c">// biased matrix factorization &mdash; SGD update</span>
+e = r_ui - (mu + b_u + b_i + p_u.dot(q_i))
+p_u += lr * (e * q_i  - reg * p_u)
+q_i += lr * (e * p_u  - reg * q_i)
+b_u += lr * (e        - reg * b_u)
+b_i += lr * (e        - reg * b_i)
+
+<span class="c">// predicted preference</span>
+r_hat = mu + b_u + b_i + p_u.dot(q_i)</code></pre>
+          </div>
+
+          <footer class="card__foot">
+            <span class="lang">Angular &middot; NestJS &middot; Prisma &middot; PostgreSQL</span>
+            <span class="badge">JWT</span>
+            <span class="badge">Leaflet/OSM</span>
+            <span class="badge">SGD</span>
+            <a class="card__link" href="https://github.com/panteliskts/matbon_tedy" target="_blank" rel="noopener">view on github <span class="arr">→</span></a>
+          </footer>
+        </article>
+
+        <!-- ░░ Project 5 · WikiArt FNN/CNN ░░ -->
+        <article class="card card--feat">
+          <header class="card__head">
+            <div class="card__tag tag--dl">deep-learning &middot; pytorch</div>
+            <span class="card__year">2025</span>
+          </header>
+          <h3 class="card__title">WikiArt Image Classification (FNN &amp; CNN)</h3>
+          <p class="card__sub">
+            A university deep-learning study on classifying paintings into
+            four art-movement classes (Baroque, Impressionism, Cubism,
+            Abstract Expressionism) from the WikiArt dataset at
+            <code>32&times;32</code> resolution. I trained a flat-pixel
+            <strong>FNN</strong> baseline, then designed a 4-layer
+            <strong>CNN</strong> and ablated <code>padding + pooling +
+            ReLU</code> one piece at a time &mdash; the convolutional
+            structure turned out to matter far more than parameter count.
+          </p>
+
+          <ul class="card__bullets">
+            <li><span>FNN baseline</span><span class="meta">3 layers &middot; F1 0.4943</span></li>
+            <li><span>CNN &sect;2.3</span><span class="meta">1.06M params &middot; F1 0.5539</span></li>
+            <li><span>Optimizer sweep</span><span class="meta">SGD &middot; Adam &middot; AdamW &middot; RMSprop</span></li>
+            <li><span>Reproducible</span><span class="meta">seed=42 &middot; Kaggle T4&times;2</span></li>
+          </ul>
+
+          <div class="card__snippet">
+<pre><code><span class="c"># 4-layer CNN (best configuration)</span>
+<span class="t">class</span> CNN(nn.Module):
+    <span class="k">def</span> __init__(<span class="t">self</span>):
+        <span class="t">self</span>.conv1 = Conv2d(3,  16, k=5, padding=2)
+        <span class="t">self</span>.conv2 = Conv2d(16, 32, k=5, padding=2)
+        <span class="t">self</span>.conv3 = Conv2d(32, 64, k=5, padding=2)
+        <span class="t">self</span>.conv4 = Conv2d(64,128, k=5, padding=2)
+        <span class="t">self</span>.pool  = MaxPool2d(2)
+    <span class="k">def</span> forward(<span class="t">self</span>, x):
+        x = relu(self.pool(self.conv1(x)))
+        x = relu(self.pool(self.conv2(x)))
+        x = relu(self.pool(self.conv3(x)))
+        x = relu(self.pool(self.conv4(x)))
+        <span class="k">return</span> self.fc(x.flatten(1))</code></pre>
+          </div>
+
+          <footer class="card__foot">
+            <span class="lang">PyTorch &middot; scikit-learn &middot; matplotlib</span>
+            <span class="badge">FNN vs CNN</span>
+            <span class="badge">BatchNorm</span>
+            <span class="badge">F1 0.5539</span>
+            <a class="card__link" href="https://github.com/Mantb/dl-image-classification" target="_blank" rel="noopener">view on github <span class="arr">→</span></a>
+          </footer>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── Contact ───── -->
+  <section id="contact" class="contact">
+    <div class="container contact__inner">
+      <div class="section-head section-head--center">
+        <span class="section-tag">03 // contact</span>
+        <h2>Let&rsquo;s build something at the metal</h2>
+        <p class="section-sub">
+          I&rsquo;m open to collaborations on systems-level projects,
+          compiler design, and high-performance infrastructure. The fastest
+          way to reach me is email.
+        </p>
+      </div>
+
+      <ul class="contact__list">
+        <li>
+          <span class="contact__lbl">email</span>
+          <a href="mailto:matthaios.bonis@gmail.com">matthaios.bonis@gmail.com</a>
+        </li>
+        <li>
+          <span class="contact__lbl">github</span>
+          <a href="https://github.com/" target="_blank" rel="noopener">github.com/matthaios-bonis</a>
+        </li>
+        <li>
+          <span class="contact__lbl">location</span>
+          <span>Greece &middot; CET &middot; open to remote</span>
+        </li>
+      </ul>
+
+      <a href="mailto:matthaios.bonis@gmail.com" class="btn btn--primary btn--lg">send a message <span class="arr">→</span></a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span class="prompt">&gt;_ matt.bonis</span>
+      <span>&copy; <span id="year"></span> &middot; built with vanilla html/css/js &middot; no frameworks</span>
+    </div>
+  </footer>
+
+  <script src="assets/script.js"></script>
 </body>
 </html>
