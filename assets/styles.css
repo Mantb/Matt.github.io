@@ -537,3 +537,60 @@ section { padding: 96px 0; }
   }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* ============================================================
+   3D GAME STYLES
+   ============================================================ */
+
+#projects {
+  position: relative;
+  /* Make the section very tall to allow scrolling through the 3D space */
+  padding-bottom: 200vh;
+}
+
+#game-canvas {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none; /* Let clicks pass through to cards */
+  /* Remove margins/padding from container if any */
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+}
+
+#projects .container {
+  position: relative;
+  z-index: 10;
+}
+
+/* Restructure grid to a linear list with spacing */
+.projects__grid {
+  display: block;
+}
+
+.projects__grid .game-card {
+  margin-bottom: 80vh; /* Spread them out to match 3D progression */
+  opacity: 0.1;
+  transform: translateY(40px);
+  filter: grayscale(100%);
+  pointer-events: none;
+  transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
+  background: rgba(14, 20, 28, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.projects__grid .game-card.unlocked {
+  opacity: 1;
+  transform: translateY(0);
+  filter: grayscale(0%);
+  pointer-events: auto;
+}
+
+/* Ensure the last card doesn't have huge margin */
+.projects__grid .game-card:last-child {
+  margin-bottom: 0;
+}
