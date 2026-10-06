@@ -594,3 +594,15 @@ section { padding: 96px 0; }
 .projects__grid .game-card:last-child {
   margin-bottom: 0;
 }
+
+
+/* Additional overrides for the gamified experience */
+.projects__grid .game-card {
+  max-width: 600px;
+  margin-left: auto; /* Push cards to the right so we can see the character on the left */
+}
+
+/* Ensure the scroll progress container is tall enough for 5 cards */
+#projects {
+  padding-bottom: 300vh;
+}
