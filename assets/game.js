@@ -74,17 +74,16 @@
 
   // 4. Load the Character Model
   const loader = new THREE.GLTFLoader();
-  loader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Soldier.glb', function (gltf) {
+  loader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/RobotExpressive/RobotExpressive.glb', function (gltf) {
     const model = gltf.scene;
-    // The soldier model is quite large, let's scale it down
-    model.scale.set(1.5, 1.5, 1.5);
+    // Scale the robot model
+    model.scale.set(0.5, 0.5, 0.5);
 
     // Enable shadows for the model
     model.traverse((object) => {
       if (object.isMesh) {
         object.castShadow = true;
         object.receiveShadow = true;
-        // Adjust materials slightly if desired, but default is usually fine
       }
     });
 
@@ -105,10 +104,9 @@
       const mixer = new THREE.AnimationMixer(model);
       window.gameMixer = mixer;
 
-      // Typical names in Soldier.glb: 'Idle', 'Walk', 'Run'
-      // We will grab Idle and Walk
+      // Typical names in RobotExpressive.glb: 'Idle', 'Walking'
       const idleClip = THREE.AnimationClip.findByName(animations, 'Idle');
-      const walkClip = THREE.AnimationClip.findByName(animations, 'Walk');
+      const walkClip = THREE.AnimationClip.findByName(animations, 'Walking');
 
       if (idleClip) window.gameActions.idle = mixer.clipAction(idleClip);
       if (walkClip) window.gameActions.walk = mixer.clipAction(walkClip);
@@ -127,6 +125,13 @@
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // Mouse Interaction (Look towards mouse)
+  let mouseX = 0;
+  window.addEventListener('mousemove', (e) => {
+    // Normalize mouse X from -1 to 1
+    mouseX = (e.clientX / window.innerWidth) * 2 - 1;
   });
 
   // Animation Loop Setup
@@ -169,35 +174,70 @@
        const pt = window.gameCurve.getPoint(currentProgress);
        window.gameCharacter.position.copy(pt);
 
-       // Calculate rotation (look ahead)
-       const lookAheadProgress = Math.min(1, currentProgress + 0.01);
-       if (lookAheadProgress > currentProgress) {
-           const lookAtPt = window.gameCurve.getPoint(lookAheadProgress);
-           // We want the character to stand upright
-           lookAtPt.y = pt.y;
-           window.gameCharacter.lookAt(lookAtPt);
+       // Calculate rotation (look ahead/behind depending on scrolling direction)
+       // The user requested walking in reverse direction:
+       // When scrolling up, currentProgress decreases, so look backwards on the curve
+       let lookAtPt;
+       const dirDiff = targetProgress - currentProgress;
+
+       // Add a state variable to track last direction (1 for forward, -1 for backward)
+       if (typeof window.lastMoveDir === 'undefined') window.lastMoveDir = 1;
+
+       // Only update direction if moving significantly
+       if (Math.abs(dirDiff) > 0.0005) {
+           window.lastMoveDir = dirDiff >= 0 ? 1 : -1;
        }
 
-       // Third-person camera follow logic
-       // Place the camera behind and above the character
-       // Get the direction the character is facing
-       const charDir = new THREE.Vector3(0, 0, 1);
-       charDir.applyQuaternion(window.gameCharacter.quaternion);
-       charDir.normalize();
+       if (window.lastMoveDir === 1) {
+           // Face forwards
+           const lookAheadProgress = Math.min(1, currentProgress + 0.01);
+           lookAtPt = window.gameCurve.getPoint(lookAheadProgress);
+       } else {
+           // Face backwards
+           const lookBehindProgress = Math.max(0, currentProgress - 0.01);
+           lookAtPt = window.gameCurve.getPoint(lookBehindProgress);
+       }
 
-       // Offset: 4 units back, 3 units up
-       const camOffset = charDir.clone().multiplyScalar(-5);
-       camOffset.y = 3;
+       // Smooth rotation instead of instant snap
+       if (lookAtPt.distanceTo(pt) > 0.001) {
+           lookAtPt.y = pt.y; // Keep upright
+
+           // We use quaternions for smooth rotation
+           const targetRotation = new THREE.Matrix4().lookAt(window.gameCharacter.position, lookAtPt, window.gameCharacter.up);
+           const targetQuaternion = new THREE.Quaternion().setFromRotationMatrix(targetRotation);
+
+           window.gameCharacter.quaternion.slerp(targetQuaternion, 0.1);
+       }
+
+       // Add slight rotation offset based on mouse position to make it interactive
+       window.gameCharacter.rotateY(-mouseX * 0.5); // rotate left/right slightly based on mouse
+
+       // Third-person camera follow logic
+       // Make the follow distance and zoom much more subtle.
+       // Get the direction of the path rather than character rotation
+       // so camera doesn't flip abruptly when character turns around.
+
+       const nextPathPt = window.gameCurve.getPoint(Math.min(1, currentProgress + 0.01));
+       const pathDir = new THREE.Vector3().subVectors(nextPathPt, pt).normalize();
+       if (pathDir.length() === 0) pathDir.set(0, 0, 1); // fallback
+
+       // Offset: 6 units back along path direction, 4 units up
+       const camOffset = pathDir.clone().multiplyScalar(-6);
+       camOffset.y = 4;
 
        const camPosTarget = pt.clone().add(camOffset);
 
        // Smooth camera movement
-       camera.position.lerp(camPosTarget, 0.1);
+       camera.position.lerp(camPosTarget, 0.05);
 
-       // Look slightly ahead of the character
+       // Look steadily at the character's position
        const camLookTarget = pt.clone();
        camLookTarget.y += 1.5; // Look at head height
-       camera.lookAt(camLookTarget);
+
+       // Smoothly update where the camera is looking so it doesn't snap
+       if (!window.cameraLookTarget) window.cameraLookTarget = camLookTarget.clone();
+       window.cameraLookTarget.lerp(camLookTarget, 0.1);
+       camera.lookAt(window.cameraLookTarget);
 
        // Handle Animation Switching (Walk vs Idle)
        if (window.gameActions.walk && window.gameActions.idle) {
