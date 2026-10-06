@@ -77,7 +77,7 @@
   loader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/RobotExpressive/RobotExpressive.glb', function (gltf) {
     const model = gltf.scene;
     // Scale the robot model
-    model.scale.set(0.5, 0.5, 0.5);
+    model.scale.set(0.7, 0.7, 0.7);
 
     // Enable shadows for the model
     model.traverse((object) => {
