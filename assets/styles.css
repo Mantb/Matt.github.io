@@ -544,8 +544,8 @@ section { padding: 96px 0; }
 
 #projects {
   position: relative;
-  /* Make the section very tall to allow scrolling through the 3D space */
-  padding-bottom: 200vh;
+  /* Remove excessive padding to prevent too much blank space */
+  padding-bottom: 0vh;
 }
 
 #game-canvas {
@@ -574,7 +574,7 @@ section { padding: 96px 0; }
 }
 
 .projects__grid .game-card {
-  margin-bottom: 80vh; /* Spread them out to match 3D progression */
+  margin-bottom: 30vh; /* Spread them out to match 3D progression */
   opacity: 0;
   /* Transform for a dramatic pop-in */
   transform: translateZ(-200px) translateY(80px) rotateX(-20deg);
@@ -599,7 +599,7 @@ section { padding: 96px 0; }
 
 /* Ensure the last card doesn't have huge margin */
 .projects__grid .game-card:last-child {
-  margin-bottom: 0;
+  margin-bottom: 5vh;
 }
 
 
@@ -611,7 +611,7 @@ section { padding: 96px 0; }
   z-index: 100;
 }
 
-/* Ensure the scroll progress container is tall enough for 5 cards */
+/* Adjust padding to control the distance between projects and contact section */
 #projects {
-  padding-bottom: 300vh;
+  padding-bottom: 10vh;
 }

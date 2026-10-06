@@ -174,43 +174,28 @@
        const pt = window.gameCurve.getPoint(currentProgress);
        window.gameCharacter.position.copy(pt);
 
-       // Calculate rotation (look ahead/behind depending on scrolling direction)
-       // The user requested walking in reverse direction:
-       // When scrolling up, currentProgress decreases, so look backwards on the curve
-       let lookAtPt;
+       // Calculate rotation to always face the camera (viewer)
        const dirDiff = targetProgress - currentProgress;
-
-       // Add a state variable to track last direction (1 for forward, -1 for backward)
-       if (typeof window.lastMoveDir === 'undefined') window.lastMoveDir = 1;
 
        // Only update direction if moving significantly
        if (Math.abs(dirDiff) > 0.0005) {
            window.lastMoveDir = dirDiff >= 0 ? 1 : -1;
        }
 
-       if (window.lastMoveDir === 1) {
-           // Face forwards
-           const lookAheadProgress = Math.min(1, currentProgress + 0.01);
-           lookAtPt = window.gameCurve.getPoint(lookAheadProgress);
-       } else {
-           // Face backwards
-           const lookBehindProgress = Math.max(0, currentProgress - 0.01);
-           lookAtPt = window.gameCurve.getPoint(lookBehindProgress);
-       }
+       // Smoothly look towards the camera position, so we always see the face
+       const lookAtPt = new THREE.Vector3(pt.x + (pt.x - camera.position.x), pt.y, pt.z + (pt.z - camera.position.z));
 
-       // Smooth rotation instead of instant snap
        if (lookAtPt.distanceTo(pt) > 0.001) {
-           lookAtPt.y = pt.y; // Keep upright
-
            // We use quaternions for smooth rotation
            const targetRotation = new THREE.Matrix4().lookAt(window.gameCharacter.position, lookAtPt, window.gameCharacter.up);
            const targetQuaternion = new THREE.Quaternion().setFromRotationMatrix(targetRotation);
 
+           // Apply slight rotation offset based on mouse position to make it interactive
+           const mouseOffsetQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -mouseX * 0.5);
+           targetQuaternion.multiply(mouseOffsetQuaternion);
+
            window.gameCharacter.quaternion.slerp(targetQuaternion, 0.1);
        }
-
-       // Add slight rotation offset based on mouse position to make it interactive
-       window.gameCharacter.rotateY(-mouseX * 0.5); // rotate left/right slightly based on mouse
 
        // Third-person camera follow logic
        // Make the follow distance and zoom much more subtle.
@@ -221,9 +206,9 @@
        const pathDir = new THREE.Vector3().subVectors(nextPathPt, pt).normalize();
        if (pathDir.length() === 0) pathDir.set(0, 0, 1); // fallback
 
-       // Offset: 6 units back along path direction, 4 units up
-       const camOffset = pathDir.clone().multiplyScalar(-6);
-       camOffset.y = 4;
+       // Offset: 12 units back along path direction, 6 units up (less zoomed in)
+       const camOffset = pathDir.clone().multiplyScalar(-12);
+       camOffset.y = 6;
 
        const camPosTarget = pt.clone().add(camOffset);
 
@@ -239,7 +224,7 @@
        window.cameraLookTarget.lerp(camLookTarget, 0.1);
        camera.lookAt(window.cameraLookTarget);
 
-       // Handle Animation Switching (Walk vs Idle)
+       // Handle Animation Switching (Walk vs Idle) and TimeScale
        if (window.gameActions.walk && window.gameActions.idle) {
           if (Math.abs(diff) > 0.001) {
              // Moving
@@ -248,12 +233,22 @@
                  window.gameActions.walk.reset().play();
                  window.gameActions.idle.crossFadeTo(window.gameActions.walk, 0.2, false);
              }
+
+             // If scrolling down (moving away from camera), play animation backwards
+             // If scrolling up (moving towards camera), play animation forwards
+             if (window.lastMoveDir === 1) {
+                 window.gameActions.walk.timeScale = -1; // Walking backward/retreating
+             } else {
+                 window.gameActions.walk.timeScale = 1;  // Walking forward
+             }
           } else {
              // Stopped
              if (isScrolling) {
                  isScrolling = false;
                  window.gameActions.idle.reset().play();
                  window.gameActions.walk.crossFadeTo(window.gameActions.idle, 0.2, false);
+                 // Reset timeScale for next time
+                 window.gameActions.walk.timeScale = 1;
              }
           }
        }
@@ -276,11 +271,15 @@
           const windowHeight = window.innerHeight;
           const sectionHeight = projectsSection.offsetHeight;
 
-          const scrolledPastTop = window.scrollY - projectsSection.offsetTop + windowHeight/2;
+          // We want the progress to be 0 when the top of the section enters the bottom of the screen
+          // and 1 when the bottom of the section leaves the top of the screen (or earlier if needed)
+          const scrollStart = projectsSection.offsetTop - windowHeight;
+          const scrollEnd = projectsSection.offsetTop + sectionHeight - windowHeight;
+          const scrollRange = scrollEnd - scrollStart;
 
           let rawProgress = 0;
-          if (scrolledPastTop > 0) {
-             rawProgress = (scrolledPastTop / sectionHeight);
+          if (window.scrollY > scrollStart) {
+             rawProgress = (window.scrollY - scrollStart) / scrollRange;
           }
           if (rawProgress < 0) rawProgress = 0;
           if (rawProgress > 1) rawProgress = 1;
