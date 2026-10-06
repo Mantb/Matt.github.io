@@ -191,7 +191,9 @@
            const targetQuaternion = new THREE.Quaternion().setFromRotationMatrix(targetRotation);
 
            // Apply slight rotation offset based on mouse position to make it interactive
-           const mouseOffsetQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -mouseX * 0.5);
+           // Apply slight rotation offset based on mouse position AND a base offset so we see the left side slightly
+           const baseOffsetRotation = -Math.PI / 6; // Turn 30 degrees to the left
+           const mouseOffsetQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), baseOffsetRotation + (-mouseX * 0.5));
            targetQuaternion.multiply(mouseOffsetQuaternion);
 
            window.gameCharacter.quaternion.slerp(targetQuaternion, 0.1);
@@ -207,7 +209,7 @@
        if (pathDir.length() === 0) pathDir.set(0, 0, 1); // fallback
 
        // Offset: 12 units back along path direction, 6 units up (less zoomed in)
-       const camOffset = pathDir.clone().multiplyScalar(-12);
+       const camOffset = pathDir.clone().multiplyScalar(12);
        camOffset.y = 6;
 
        const camPosTarget = pt.clone().add(camOffset);
@@ -237,9 +239,9 @@
              // If scrolling down (moving away from camera), play animation backwards
              // If scrolling up (moving towards camera), play animation forwards
              if (window.lastMoveDir === 1) {
-                 window.gameActions.walk.timeScale = -1; // Walking backward/retreating
+                 window.gameActions.walk.timeScale = 1; // Walking forward
              } else {
-                 window.gameActions.walk.timeScale = 1;  // Walking forward
+                 window.gameActions.walk.timeScale = -1;  // Walking backward
              }
           } else {
              // Stopped
